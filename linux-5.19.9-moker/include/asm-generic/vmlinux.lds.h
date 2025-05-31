@@ -124,14 +124,28 @@
  * used to determine the order of the priority of each sched class in
  * relation to each other.
  */
-#define SCHED_DATA				\
-	STRUCT_ALIGN();				\
-	__sched_class_highest = .;		\
-	*(__stop_sched_class)			\
-	*(__dl_sched_class)			\
-	*(__rt_sched_class)			\
-	*(__fair_sched_class)			\
-	*(__idle_sched_class)			\
+#ifdef CONFIG_MOKER_SCHED_LIFO_POLICY
+#define LIFO_SCHED_ENTRY *(__lf_sched_class)
+#else
+#define LIFO_SCHED_ENTRY
+#endif
+
+#ifdef CONFIG_MOKER_SCHED_RM_POLICY
+#define RM_SCHED_ENTRY *(__rm_sched_class)
+#else
+#define RM_SCHED_ENTRY
+#endif
+
+#define SCHED_DATA \
+	STRUCT_ALIGN(); \
+	__sched_class_highest = .; \
+	*(__stop_sched_class) \
+	*(__dl_sched_class) \
+	*(__rt_sched_class) \
+	LIFO_SCHED_ENTRY \
+	RM_SCHED_ENTRY \
+	*(__fair_sched_class) \
+	*(__idle_sched_class) \
 	__sched_class_lowest = .;
 
 /* The actual configuration determine if the init/exit sections

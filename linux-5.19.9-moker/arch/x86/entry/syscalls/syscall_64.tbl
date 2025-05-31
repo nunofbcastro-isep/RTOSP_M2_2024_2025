@@ -373,6 +373,29 @@
 449	common	futex_waitv		sys_futex_waitv
 450	common	set_mempolicy_home_node	sys_set_mempolicy_home_node
 
+#ifdef CONFIG_MOKER_FRAMEWORK
+451 common moker_tracing sys_moker_tracing
+#endif
+
+#ifdef CONFIG_MOKER_MUTEX_FIFO
+452 common moker_lf_mutex_lock sys_moker_lf_mutex_lock
+453 common moker_lf_mutex_unlock sys_moker_lf_mutex_unlock
+#endif
+
+#ifdef CONFIG_MOKER_SCHED_RM_POLICY
+454 common set_rm_period sys_set_rm_period
+#endif
+
+#ifdef CONFIG_MOKER_MUTEX_PIP
+455 common moker_pip_mutex_lock sys_moker_pip_mutex_lock
+456 common moker_pip_mutex_unlock sys_moker_pip_mutex_unlock
+#endif
+
+#ifdef CONFIG_MOKER_MUTEX_PCP
+457 common moker_pcp_mutex_lock sys_moker_pcp_mutex_lock
+458 common moker_pcp_mutex_unlock sys_moker_pcp_mutex_unlock
+#endif
+
 #
 # Due to a historical design error, certain syscalls are numbered differently
 # in x32 as compared to native x86_64.  These syscalls have numbers 512-547.

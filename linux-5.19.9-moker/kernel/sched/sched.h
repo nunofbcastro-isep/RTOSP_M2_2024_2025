@@ -96,6 +96,31 @@
 # define SCHED_WARN_ON(x)      ({ (void)(x), 0; })
 #endif
 
+#ifdef CONFIG_MOKER_TRACING
+# include "../moker/trace.h"
+#endif
+
+#ifdef CONFIG_MOKER_SCHED_LIFO_POLICY
+# include "../moker/lf_rq.h"
+#endif
+
+#ifdef CONFIG_MOKER_MUTEX_LIFO
+# include "../moker/lf_mutex.h"
+#endif
+
+#ifdef CONFIG_MOKER_SCHED_RM_POLICY
+# include "../moker/rm_rq.h"
+#endif
+
+#ifdef CONFIG_MOKER_MUTEX_PIP
+# include "../moker/pip_mutex.h"
+#endif
+
+#ifdef CONFIG_MOKER_MUTEX_PCP
+# include "../moker/pcp_mutex.h"
+#endif
+
+
 struct rq;
 struct cpuidle_state;
 
@@ -195,10 +220,32 @@ static inline int dl_policy(int policy)
 {
 	return policy == SCHED_DEADLINE;
 }
+
+#ifdef CONFIG_MOKER_SCHED_LIFO_POLICY
+static inline int lf_policy(int policy)
+{
+	return policy == SCHED_LIFO;
+}
+#endif
+
+#ifdef CONFIG_MOKER_SCHED_RM_POLICY
+static inline int rm_policy(int policy)
+{
+	return policy == SCHED_RM;
+}
+#endif
+
 static inline bool valid_policy(int policy)
 {
 	return idle_policy(policy) || fair_policy(policy) ||
-		rt_policy(policy) || dl_policy(policy);
+		rt_policy(policy) || dl_policy(policy)
+		#ifdef CONFIG_MOKER_SCHED_LIFO_POLICY
+		|| lf_policy(policy)
+		#endif
+		#ifdef CONFIG_MOKER_SCHED_RM_POLICY
+		|| rm_policy(policy)
+		#endif
+		;
 }
 
 static inline int task_has_idle_policy(struct task_struct *p)
@@ -954,6 +1001,14 @@ struct rq {
 	struct cfs_rq		cfs;
 	struct rt_rq		rt;
 	struct dl_rq		dl;
+
+	#ifdef CONFIG_MOKER_SCHED_LIFO_POLICY
+	struct lf_rq lf;
+	#endif
+	
+	#ifdef CONFIG_MOKER_SCHED_RM_POLICY
+	struct rm_rq rm;
+	#endif
 
 #ifdef CONFIG_FAIR_GROUP_SCHED
 	/* list of leaf cfs_rq on this CPU: */
@@ -2212,6 +2267,12 @@ extern struct sched_class __sched_class_lowest[];
 extern const struct sched_class stop_sched_class;
 extern const struct sched_class dl_sched_class;
 extern const struct sched_class rt_sched_class;
+#ifdef CONFIG_MOKER_SCHED_LIFO_POLICY
+extern const struct sched_class lf_sched_class;
+#endif
+#ifdef CONFIG_MOKER_SCHED_RM_POLICY
+extern const struct sched_class rm_sched_class;
+#endif
 extern const struct sched_class fair_sched_class;
 extern const struct sched_class idle_sched_class;
 
